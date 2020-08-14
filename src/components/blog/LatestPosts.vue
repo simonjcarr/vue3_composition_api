@@ -4,29 +4,30 @@
       <div class="font-bold">Latest Posts</div>
     </div>
     <div class="bg-white p-2 border-2 border-gray-400 ">
-      <div v-for="post in posts" :key="post.id">
-        <div class="mb-2">- <router-link :key="`/post/${post.id}`" :to="`/post/${post.id}`">{{ post.title }}</router-link></div>
+      <div v-for="post in recentPosts" :key="post.id">
+        <div class="mb-2">
+          -
+          <router-link :key="`/post/${post.id}`" :to="`/post/${post.id}`">{{
+            post.title
+          }}</router-link>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import usePosts from "@/composables/blog/posts.js";
+import { computed, onMounted, ref } from "vue";
 export default {
-  data() {
-    return {
-      posts: []
-    };
-  },
-  methods: {
-    fetchPosts() {
-      fetch("https://jsonplaceholder.typicode.com/posts")
-        .then(response => response.json())
-        .then(data => (this.posts = data.slice(-10)));
-    }
-  },
-  mounted() {
-    this.fetchPosts();
+  setup() {
+    let recentPosts = ref([]);
+    const { posts, fetchPosts } = usePosts();
+    onMounted(() => fetchPosts());
+    recentPosts = computed(() => {
+      return posts.value.slice(-10);
+    });
+    return { recentPosts };
   }
 };
 </script>
